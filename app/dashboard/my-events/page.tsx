@@ -10,6 +10,7 @@ import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 export default function MyEventsPage() {
   const { user } = useAuth();
@@ -28,8 +29,6 @@ export default function MyEventsPage() {
     visibility: "PUBLIC",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const fetchMyEvents = async () => {
     try {
@@ -55,8 +54,6 @@ export default function MyEventsPage() {
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const eventData = {
@@ -67,10 +64,10 @@ export default function MyEventsPage() {
 
       if (editingEvent) {
         await api.patch(`/events/${editingEvent.slug}`, eventData);
-        setSuccess("Event updated successfully!");
+        toast.success("Event updated successfully!");
       } else {
         await api.post("/events", eventData);
-        setSuccess("Event created successfully!");
+        toast.success("Event created successfully!");
       }
 
       // Reset form
@@ -90,28 +87,21 @@ export default function MyEventsPage() {
       // Refresh events
       await fetchMyEvents();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save event");
+      toast.error(err instanceof Error ? err.message : "Failed to save event");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
-    if (!confirm("Are you sure you want to delete this event?")) {
-      return;
-    }
-
+  const handleDeleteEvent = async (slug: string) => {
     try {
-      const event = events.find((e) => e.id === eventId);
-      if (!event) {
-        setError("Event not found");
-        return;
-      }
-      await api.delete(`/events/${event.slug}`);
-      setSuccess("Event deleted successfully!");
+      await api.delete(`/events/${slug}`);
+      toast.success("Event deleted successfully!");
       await fetchMyEvents();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete event");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete event",
+      );
     }
   };
 
@@ -170,18 +160,6 @@ export default function MyEventsPage() {
           </Button>
         )}
       </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">{success}</p>
-        </div>
-      )}
 
       {/* Create/Edit Form */}
       {showCreateForm && (
@@ -351,7 +329,7 @@ export default function MyEventsPage() {
               className="p-4 hover:shadow-lg transition-shadow"
             >
               <div className="mb-3">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-300 mb-2">
                   {event.title}
                 </h3>
                 <p className="text-sm text-gray-600 line-clamp-2">
@@ -402,7 +380,7 @@ export default function MyEventsPage() {
                   Edit
                 </Button>
                 <Button
-                  onClick={() => handleDeleteEvent(event.id)}
+                  onClick={() => handleDeleteEvent(event.slug)}
                   className="bg-red-600 hover:bg-red-700 text-sm"
                 >
                   Delete
