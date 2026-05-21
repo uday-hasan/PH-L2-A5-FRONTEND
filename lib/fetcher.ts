@@ -34,13 +34,19 @@ function handle401() {
     sessionStorage.removeItem("user");
     
     // Redirect to login
-    window.location.href = "/auth/login?redirected=unauthorized";
+    if (!window.location.pathname.startsWith("/auth")) {
+      window.location.href = "/auth/login?redirected=unauthorized";
+    }
   }
+}
+
+export interface FetcherOptions extends RequestInit {
+  skipRedirectOn401?: boolean;
 }
 
 async function fetcher<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: FetcherOptions = {}
 ): Promise<T> {
   const url = endpoint.startsWith("http") ? endpoint : `${API_BASE}${endpoint}`;
 
@@ -55,7 +61,9 @@ async function fetcher<T>(
 
   // Handle 401 Unauthorized
   if (res.status === 401) {
-    handle401();
+    if (!options.skipRedirectOn401) {
+      handle401();
+    }
     throw new FetchError(401, "Unauthorized. Please login again.");
   }
 
@@ -70,24 +78,24 @@ async function fetcher<T>(
 }
 
 export const api = {
-  get: <T>(endpoint: string, options?: RequestInit) =>
+  get: <T>(endpoint: string, options?: FetcherOptions) =>
     fetcher<T>(endpoint, { method: "GET", ...options }),
 
-  post: <T>(endpoint: string, body: unknown, options?: RequestInit) =>
+  post: <T>(endpoint: string, body: unknown, options?: FetcherOptions) =>
     fetcher<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(body),
       ...options,
     }),
 
-  patch: <T>(endpoint: string, body: unknown, options?: RequestInit) =>
+  patch: <T>(endpoint: string, body: unknown, options?: FetcherOptions) =>
     fetcher<T>(endpoint, {
       method: "PATCH",
       body: JSON.stringify(body),
       ...options,
     }),
 
-  delete: <T>(endpoint: string, options?: RequestInit) =>
+  delete: <T>(endpoint: string, options?: FetcherOptions) =>
     fetcher<T>(endpoint, { method: "DELETE", ...options }),
 };
 

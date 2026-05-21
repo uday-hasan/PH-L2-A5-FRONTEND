@@ -19,5 +19,5 @@ export const authApi = {
 
   logout: () => api.post<null>("/auth/logout", {}),
 
-  getMe: () => api.get<User>("/auth/me"),
+  getMe: () => api.get<User>("/auth/me", { skipRedirectOn401: true }),
 };
