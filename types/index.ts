@@ -12,7 +12,11 @@ export interface User {
 }
 
 export type EventVisibility = "PUBLIC" | "PRIVATE";
-export type ParticipationStatus = "PENDING" | "APPROVED" | "REJECTED" | "BANNED";
+export type ParticipationStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "BANNED";
 export type InvitationStatus = "PENDING" | "ACCEPTED" | "DECLINED";
 export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED";
 
@@ -45,4 +49,31 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+export interface EventDetail extends Event {
+  organizerId: string;
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    comment: string;
+    user: { id: string; name: string; avatar?: string };
+    createdAt: string;
+  }>;
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  user: { id: string; name: string; avatar?: string };
+  createdAt: string;
+}
+
+export interface Participant {
+  id: string;
+  userId: string;
+  user: { id: string; name: string; avatar?: string };
+  status: ParticipationStatus;
+  createdAt: string;
 }
