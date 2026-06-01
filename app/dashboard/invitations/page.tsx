@@ -61,7 +61,7 @@ export default function InvitationsPage() {
 
       // For paid events, redirect to Stripe checkout
       if (event.registrationFee > 0) {
-        const response = await api.post<{ checkoutUrl: string | null }>(
+        const response = await api.patch<{ checkoutUrl: string | null }>(
           `/invitations/${invitationId}/respond`,
           { accept: true },
         );
@@ -105,11 +105,6 @@ export default function InvitationsPage() {
     }
   };
 
-  const filteredInvitations = invitations.filter((inv) => {
-    if (filter === "ALL") return true;
-    return inv.status === filter;
-  });
-
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -125,7 +120,7 @@ export default function InvitationsPage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Invitations</h1>
+        <h1 className="text-3xl font-bold text-gray-300">Invitations</h1>
         <p className="text-gray-600 mt-1">Manage your event invitations</p>
       </div>
 
@@ -155,7 +150,7 @@ export default function InvitationsPage() {
       </div>
 
       {/* Invitations List */}
-      {filteredInvitations.length === 0 ? (
+      {invitations.length === 0 ? (
         <Card className="p-12 text-center">
           <p className="text-gray-600 text-lg">
             {invitations.length === 0
@@ -165,11 +160,11 @@ export default function InvitationsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredInvitations.map((invitation) => (
+          {invitations.map((invitation) => (
             <Card key={invitation.id} className="p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold text-gray-300 mb-2">
                     {invitation.event.title}
                   </h3>
                   <p className="text-gray-600 mb-4 line-clamp-2">
