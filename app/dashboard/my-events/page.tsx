@@ -151,7 +151,7 @@ export default function MyEventsPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Events</h1>
+          <h1 className="text-3xl font-bold text-gray-300">My Events</h1>
           <p className="text-gray-600 mt-1">Manage your created events</p>
         </div>
         {!showCreateForm && (

@@ -17,7 +17,7 @@ class FetchError extends Error {
   constructor(
     public status: number,
     message: string,
-    public errors?: { field: string; message: string }[]
+    public errors?: { field: string; message: string }[],
   ) {
     super(message);
     this.name = "FetchError";
@@ -32,7 +32,7 @@ function handle401() {
     localStorage.removeItem("user");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
-    
+
     // Redirect to login
     if (!window.location.pathname.startsWith("/auth")) {
       window.location.href = "/auth/login?redirected=unauthorized";
@@ -46,7 +46,7 @@ export interface FetcherOptions extends RequestInit {
 
 async function fetcher<T>(
   endpoint: string,
-  options: FetcherOptions = {}
+  options: FetcherOptions = {},
 ): Promise<T> {
   const url = endpoint.startsWith("http") ? endpoint : `${API_BASE}${endpoint}`;
 
@@ -88,7 +88,7 @@ export const api = {
       ...options,
     }),
 
-  patch: <T>(endpoint: string, body: unknown, options?: FetcherOptions) =>
+  patch: <T>(endpoint: string, body?: unknown, options?: FetcherOptions) =>
     fetcher<T>(endpoint, {
       method: "PATCH",
       body: JSON.stringify(body),

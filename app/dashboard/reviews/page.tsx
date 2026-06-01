@@ -8,6 +8,7 @@ import type { Event } from "@/types";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { formatDate } from "@/lib/utils";
+import { toast } from "react-toastify";
 
 interface Review {
   id: string;
@@ -32,8 +33,6 @@ export default function ReviewsPage() {
   });
   const [availableEvents, setAvailableEvents] = useState<Event[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -83,16 +82,14 @@ export default function ReviewsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       if (editingReview) {
         await api.patch(`/reviews/${editingReview.id}`, formData);
-        setSuccess("Review updated successfully!");
+        toast.success("Review updated successfully!");
       } else {
-        await api.post("/reviews", formData);
-        setSuccess("Review created successfully!");
+        await api.post(`/reviews/${formData.eventId}`, formData);
+        toast.success("Review created successfully!");
       }
 
       setFormData({ eventId: "", rating: 5, comment: "" });
@@ -100,7 +97,7 @@ export default function ReviewsPage() {
       setShowCreateForm(false);
       await fetchReviews();
     } catch (err) {
-      setError((err as Error).message || "Failed to save review");
+      toast.error((err as Error).message || "Failed to save review");
     } finally {
       setSubmitting(false);
     }
@@ -123,10 +120,10 @@ export default function ReviewsPage() {
 
     try {
       await api.delete(`/reviews/${reviewId}`);
-      setSuccess("Review deleted successfully!");
+      toast.success("Review deleted successfully!");
       await fetchReviews();
     } catch (err) {
-      setError((err as Error).message || "Failed to delete review");
+      toast.error((err as Error).message || "Failed to delete review");
     }
   };
 
@@ -159,8 +156,8 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Reviews</h1>
-          <p className="text-gray-600 mt-1">Manage your event reviews</p>
+          <h1 className="text-3xl font-bold">My Reviews</h1>
+          <p className="text-gray-400 mt-1">Manage your event reviews</p>
         </div>
         {!showCreateForm && (
           <Button onClick={() => setShowCreateForm(true)}>
@@ -168,18 +165,6 @@ export default function ReviewsPage() {
           </Button>
         )}
       </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">{success}</p>
-        </div>
-      )}
 
       {/* Create/Edit Form */}
       {showCreateForm && (
@@ -190,7 +175,7 @@ export default function ReviewsPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!editingReview && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Event *
                 </label>
                 <select
@@ -199,7 +184,7 @@ export default function ReviewsPage() {
                     setFormData({ ...formData, eventId: e.target.value })
                   }
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select an event...</option>
                   {availableEvents.map((event) => (
@@ -212,9 +197,7 @@ export default function ReviewsPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Rating *
-              </label>
+              <label className="block text-sm font-medium mb-3">Rating *</label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -234,7 +217,7 @@ export default function ReviewsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Your Review (Comment) *
               </label>
               <textarea
@@ -247,7 +230,7 @@ export default function ReviewsPage() {
                 rows={5}
                 minLength={10}
                 maxLength={500}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">
                 {formData.comment.length}/500 characters
@@ -278,7 +261,7 @@ export default function ReviewsPage() {
       {/* Reviews List */}
       {reviews.length === 0 ? (
         <Card className="p-12 text-center">
-          <p className="text-gray-600 text-lg mb-4">No reviews yet</p>
+          <p className="text-gray-400 text-lg mb-4">No reviews yet</p>
           <Button onClick={() => setShowCreateForm(true)}>
             Write Your First Review
           </Button>
@@ -289,10 +272,8 @@ export default function ReviewsPage() {
             <Card key={review.id} className="p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    {review.event.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="text-xl font-bold">{review.event.title}</h3>
+                  <p className="text-sm text-gray-400">
                     {formatDate(review.createdAt)}
                     {review.createdAt !== review.updatedAt && " (edited)"}
                   </p>
@@ -302,11 +283,11 @@ export default function ReviewsPage() {
                     {"★".repeat(review.rating)}
                     {"☆".repeat(5 - review.rating)}
                   </div>
-                  <p className="text-sm text-gray-600">{review.rating} / 5</p>
+                  <p className="text-sm text-gray-400">{review.rating} / 5</p>
                 </div>
               </div>
 
-              <p className="text-gray-700 mb-4">{review.comment}</p>
+              <p className="text-gray-300 mb-4">{review.comment}</p>
 
               <div className="flex gap-2">
                 {canEditReview(review) && (
@@ -327,7 +308,7 @@ export default function ReviewsPage() {
                   </>
                 )}
                 {!canEditReview(review) && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     Edit and delete unavailable (48-hour window passed)
                   </p>
                 )}
