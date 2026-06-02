@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 interface Invitation {
   id: string;
@@ -27,8 +28,6 @@ export default function InvitationsPage() {
     "ALL" | "PENDING" | "ACCEPTED" | "DECLINED"
   >("ALL");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const fetchInvitations = useCallback(async () => {
     try {
@@ -56,8 +55,6 @@ export default function InvitationsPage() {
   const handleAccept = async (invitationId: string, event: Event) => {
     try {
       setActionLoading(invitationId);
-      setError(null);
-      setSuccess(null);
 
       // For paid events, redirect to Stripe checkout
       if (event.registrationFee > 0) {
@@ -74,10 +71,10 @@ export default function InvitationsPage() {
 
       // For free events, accept directly
       await api.patch(`/invitations/${invitationId}/respond`, { accept: true });
-      setSuccess("Invitation accepted!");
+      toast.success("Invitation accepted!");
       await fetchInvitations();
     } catch (err) {
-      setError((err as Error).message || "Failed to accept invitation");
+      toast.error((err as Error).message || "Failed to accept invitation");
     } finally {
       setActionLoading(null);
     }
@@ -90,16 +87,14 @@ export default function InvitationsPage() {
 
     try {
       setActionLoading(invitationId);
-      setError(null);
-      setSuccess(null);
 
       await api.patch(`/invitations/${invitationId}/respond`, {
         accept: false,
       });
-      setSuccess("Invitation declined");
+      toast.success("Invitation declined");
       await fetchInvitations();
     } catch (err) {
-      setError((err as Error).message || "Failed to decline invitation");
+      toast.error((err as Error).message || "Failed to decline invitation");
     } finally {
       setActionLoading(null);
     }
@@ -123,18 +118,6 @@ export default function InvitationsPage() {
         <h1 className="text-3xl font-bold text-gray-300">Invitations</h1>
         <p className="text-gray-600 mt-1">Manage your event invitations</p>
       </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">{success}</p>
-        </div>
-      )}
 
       {/* Filters */}
       <div className="mb-6 flex gap-2 flex-wrap">

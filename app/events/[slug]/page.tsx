@@ -12,6 +12,7 @@ import Card from "@/components/ui/Card";
 import { formatDate } from "@/lib/utils";
 import { EventDetail, Participant } from "@/types";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -21,12 +22,10 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [userParticipation, setUserParticipation] =
     useState<Participant | null>(null);
   const [isOrganizerView, setIsOrganizerView] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
@@ -35,7 +34,7 @@ export default function EventDetailPage() {
     const fetchEventDetail = async () => {
       try {
         setLoading(true);
-        setError(null);
+        toast.error(null);
 
         // Fetch event detail (includes reviews from backend)
         const eventResponse = await api.get<EventDetail>(`/events/${slug}`);
@@ -75,7 +74,9 @@ export default function EventDetailPage() {
           }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load event");
+        toast.error(
+          err instanceof Error ? err.message : "Failed to load event",
+        );
       } finally {
         setLoading(false);
       }
@@ -92,11 +93,10 @@ export default function EventDetailPage() {
   ) => {
     try {
       setActionLoading(participationId);
-      setSuccess(null);
 
       await api.patch(`/participations/${participationId}/status`, { status });
 
-      setSuccess(`Participation ${status.toLowerCase()}!`);
+      toast.success(`Participation ${status.toLowerCase()}!`);
 
       // Refresh participants
       if (event && isOrganizerView) {
@@ -110,7 +110,7 @@ export default function EventDetailPage() {
         }
       }
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof Error ? err.message : "Failed to update participation",
       );
     } finally {
@@ -140,10 +140,10 @@ export default function EventDetailPage() {
           (p) => p.eventId === event?.id,
         );
         setUserParticipation(participation);
-        setSuccess("Successfully joined the event!");
+        toast.success("Successfully joined the event!");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to join event");
+      toast.error(err instanceof Error ? err.message : "Failed to join event");
     }
   };
 
@@ -156,31 +156,32 @@ export default function EventDetailPage() {
       await api.delete(`/events/${event?.slug}`);
       window.location.href = "/dashboard/my-events";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete event");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete event",
+      );
     }
   };
 
   const handleSendInvitation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail.trim()) {
-      setError("Please enter an email address");
+      toast.error("Please enter an email address");
       return;
     }
 
     try {
       setInviting(true);
-      setError(null);
-      setSuccess(null);
+      toast.error(null);
 
       await api.post(`/invitations/${event?.id}/invite`, {
         receiverEmail: inviteEmail,
       });
 
-      setSuccess(`Invitation sent to ${inviteEmail}!`);
+      toast.success(`Invitation sent to ${inviteEmail}!`);
       setInviteEmail("");
       setShowInviteForm(false);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof Error ? err.message : "Failed to send invitation",
       );
     } finally {
@@ -203,7 +204,7 @@ export default function EventDetailPage() {
     );
   }
 
-  if (error || !event) {
+  if (!event) {
     return (
       <div className="min-h-screen bg-background py-12">
         <div className="max-w-4xl mx-auto px-4">
@@ -211,9 +212,7 @@ export default function EventDetailPage() {
             <h1 className="text-2xl font-bold text-red-400 mb-2">
               Event Not Found
             </h1>
-            <p className="text-red-300 mb-4">
-              {error || "This event does not exist"}
-            </p>
+            <p className="text-red-300 mb-4">{"This event does not exist"}</p>
             <Button onClick={() => (window.location.href = "/events")}>
               Back to Events
             </Button>
@@ -228,18 +227,6 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen bg-background py-12">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Success/Error Messages */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-            <p className="text-red-300">{error}</p>
-          </div>
-        )}
-        {success && (
-          <div className="mb-6 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
-            <p className="text-green-300">{success}</p>
-          </div>
-        )}
-
         {/* Hero Section */}
         <div className="bg-linear-to-r from-blue-600 to-blue-800 rounded-lg p-8 text-white mb-8">
           <div className="flex items-start justify-between mb-4">
