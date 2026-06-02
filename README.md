@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+````md
+# 🚀 Planora - Frontend
 
-## Getting Started
+**Planora** is a secure, modern event management platform built with Next.js. It allows users to discover, create, and manage events, while providing a seamless interface for payments and participant management.
 
-First, run the development server:
+## 🔗 Deployment Links
+
+- **Live Application:** https://planora.udayhasan.dev
+- **Backend API:** https://api-planora.udayhasan.dev
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 15
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React
+- **State Management:** React Context API
+- **Form Handling:** React Hook Form & Zod
+- **Deployment:** VPS
+
+---
+
+## ✨ Key Features
+
+- **Dynamic Homepage:** Hero section, Upcoming Events slider, and Category filters.
+- **Advanced Filtering:** Search events by title or organizer and filter by visibility and pricing.
+- **Comprehensive Dashboard:**
+  - **My Events:** Manage hosted events and participants.
+  - **Invitations:** Accept or decline invitations.
+  - **Reviews:** Manage event feedback and ratings.
+- **Secure Authentication:** JWT-based authentication with protected routes.
+- **Payment Integration:** Seamless payment workflow for paid events.
+- **Responsive Design:** Optimized for Mobile, Tablet, and Desktop devices.
+
+---
+
+## 📁 Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+src/
+├── app/
+├── components/
+├── context/
+├── hooks/
+├── lib/
+├── services/
+├── types/
+└── utils/
+```
+````
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/uday-hasan/PH-L2-A5-FRONTEND.git
+cd PH-L2-A5-FRONTEND
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+bun install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Configure environment variables
 
-## Learn More
+Create a `.env.local` file in the root directory:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+NEXT_PUBLIC_API_URL="BACKEND_URL"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Start the development server
 
-## Deploy on Vercel
+```bash
+bun run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 5. Open in browser
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```txt
+http://localhost:3000
+```
+
+---
+
+## 📦 Available Scripts
+
+```bash
+# Start development server
+bun run dev
+
+# Build for production
+bun run build
+
+# Start production server
+bun run start
+```
+
+---
+
+## 🔐 Authentication Flow
+
+- User logs in or registers.
+- Backend returns JWT token.
+- Token is securely stored and attached to authenticated requests.
+- Protected routes and dashboard features require valid authentication.
+
+---
+
+## 💳 Payment Workflow
+
+- Users can join paid events through Stripe checkout.
+- Successful payments automatically update participation status.
+- Hosts can monitor participant payment status from the dashboard.
+
+---
+
+## 📱 Responsive Support
+
+Planora is fully responsive and optimized for:
+
+- Mobile Devices
+- Tablets
+- Desktop Screens
+
+---
+
+```
+
+```
