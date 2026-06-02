@@ -124,7 +124,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-5 rounded-lg border border-[#1e1e2e] bg-[#1a1a2e]/50 p-3 space-y-1">
+          {/* <div className="mt-5 rounded-lg border border-[#1e1e2e] bg-[#1a1a2e]/50 p-3 space-y-1">
             <p className="text-xs font-medium text-slate-400">Demo accounts:</p>
             <p className="text-xs text-slate-400">
               Admin: <span className="text-white">admin@planora.com</span> /{" "}
@@ -134,7 +134,7 @@ export default function LoginPage() {
               User: <span className="text-white">user@planora.com</span> /{" "}
               <span className="text-white">User@123</span>
             </p>
-          </div>
+          </div> */}
         </div>
 
         <p className="mt-6 text-center text-sm text-slate-400">
