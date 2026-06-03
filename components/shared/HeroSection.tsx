@@ -1,6 +1,9 @@
+"use client";
 import Link from "next/link";
 import { Calendar, MapPin, ArrowRight, Sparkles } from "lucide-react";
 import { eventsApi } from "@/lib/events";
+import { useEffect, useState } from "react";
+import { Event } from "@/types";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-US", {
@@ -10,14 +13,61 @@ function formatDate(d: string) {
   });
 }
 
-export async function HeroSection() {
-  let featured = null;
-  try {
-    featured = await eventsApi.getFeatured();
-    console.log("Featured event fetched:", featured);
-  } catch (error) {
-    console.error("Failed to fetch featured event:", error);
-  }
+function FeaturedSkeleton() {
+  return (
+    <div className="relative">
+      <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-violet-600/20 to-purple-600/20 blur-sm" />
+      <div className="relative rounded-2xl border border-[#1e1e2e] bg-[#111118] p-6 space-y-5 animate-pulse">
+        {/* Badge */}
+        <div className="h-5 w-32 rounded-full bg-violet-500/20" />
+        {/* Title */}
+        <div className="space-y-2">
+          <div className="h-7 w-3/4 rounded-md bg-white/10" />
+          <div className="h-7 w-1/2 rounded-md bg-white/10" />
+        </div>
+        {/* Description */}
+        <div className="space-y-2">
+          <div className="h-4 w-full rounded-md bg-white/10" />
+          <div className="h-4 w-full rounded-md bg-white/10" />
+          <div className="h-4 w-2/3 rounded-md bg-white/10" />
+        </div>
+        {/* Date & Venue */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded bg-violet-500/20" />
+            <div className="h-4 w-48 rounded-md bg-white/10" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded bg-violet-500/20" />
+            <div className="h-4 w-36 rounded-md bg-white/10" />
+          </div>
+        </div>
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="h-5 w-20 rounded-md bg-white/10" />
+          <div className="h-9 w-28 rounded-lg bg-violet-500/20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HeroSection() {
+  const [featured, setFeatured] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await eventsApi.getFeatured();
+        setFeatured(data);
+      } catch (error) {
+        console.error("Failed to fetch featured event:", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-[#0a0a0f]">
@@ -33,7 +83,7 @@ export async function HeroSection() {
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
               Create & Join{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
                 Amazing Events
               </span>
             </h1>
@@ -69,10 +119,12 @@ export async function HeroSection() {
             </div>
           </div>
 
-          {/* Right: Featured or fallback */}
-          {featured ? (
+          {/* Right: Loading → Featured → Fallback */}
+          {loading ? (
+            <FeaturedSkeleton />
+          ) : featured ? (
             <div className="relative">
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 blur-sm" />
+              <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-violet-600/20 to-purple-600/20 blur-sm" />
               <div className="relative rounded-2xl border border-[#1e1e2e] bg-[#111118] p-6 space-y-5">
                 <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/20 border border-violet-500/30 px-2.5 py-0.5 text-xs font-medium text-violet-300">
                   ⭐ Featured Event
@@ -114,7 +166,7 @@ export async function HeroSection() {
             </div>
           ) : (
             <div className="relative hidden lg:block">
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 blur-sm" />
+              <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-violet-600/20 to-purple-600/20 blur-sm" />
               <div className="relative rounded-2xl border border-[#1e1e2e] bg-[#111118] p-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="h-16 w-16 rounded-2xl bg-violet-500/20 flex items-center justify-center">
