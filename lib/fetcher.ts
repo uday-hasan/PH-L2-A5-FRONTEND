@@ -56,6 +56,7 @@ async function fetcher<T>(
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
+    cache: "no-store",
     ...options,
   });
 

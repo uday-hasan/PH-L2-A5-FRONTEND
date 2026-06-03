@@ -136,7 +136,7 @@ export default function DashboardLayout({
 
         {/* Mobile FAB */}
         <button
-          className="lg:hidden fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-900/50"
+          className="lg:hidden fixed bottom-6 left-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-violet-600 text-white shadow-lg shadow-violet-900/50"
           onClick={() => setSidebarOpen(true)}
         >
           <Menu className="h-5 w-5" />
